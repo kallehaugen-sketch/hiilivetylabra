@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="fi"><head><meta charset="utf-8"><title>Hiilivetylabra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f7f8f5;--sf:#fff;--tx:#1b231e;--mu:#59675f;--ac:#1d7456;--al:#e3f2ea;--bd:#d6dcd6;--er:#b3382c;--ex:#7b3fa8;--el:#f0e6f7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#121714;--sf:#1b231e;--tx:#e6ede8;--mu:#9aaaa0;--ac:#4fc496;--al:#1f3a2e;--bd:#33403a;--er:#f07a6c;--ex:#c195ea;--el:#33264a}}
+:root[data-theme=dark]{--bg:#121714;--sf:#1b231e;--tx:#e6ede8;--mu:#9aaaa0;--ac:#4fc496;--al:#1f3a2e;--bd:#33403a;--er:#f07a6c;--ex:#c195ea;--el:#33264a}
+body{margin:0;font:16px/1.55 system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx)}
+header{padding:16px 16px 4px}h1{margin:0;font-size:22px}header p{margin:2px 0 0;color:var(--mu);font-size:14px}
+nav{display:flex;gap:6px;padding:10px 16px;overflow-x:auto}
+nav button{flex:none;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:8px 13px;border-radius:20px;font:inherit;font-size:14px;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}nav button.x.on{background:var(--ex);border-color:var(--ex)}
+main{padding:0 16px 32px;max-width:760px;margin:auto}.p{display:none}.p.on{display:block}
+h2{font-size:19px;margin:24px 0 6px}.xp h2{color:var(--ex)}
+.card,.box{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--bd);padding:5px 6px;text-align:left}
+.tip{background:var(--al);border-radius:10px;padding:10px 12px}.xp .tip{background:var(--el)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+figure{margin:0;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:8px 10px}figcaption{text-align:center;font-weight:600}
+figcaption small,.ti small{color:var(--mu);font-weight:400}svg{display:block;margin:auto;color:var(--tx)}
+.hit{fill:var(--al);opacity:.55;stroke:var(--ac);stroke-dasharray:3 3;cursor:pointer}.xp .hit,.xq .hit{fill:var(--el);stroke:var(--ex)}
+.ctl{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--mu)}select,input,button{font:inherit;color:var(--tx)}
+select,input{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:6px 8px}input{width:100%;box-sizing:border-box;margin:8px 0}
+button.go,button.nx{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 18px;cursor:pointer;margin-top:6px}.xq button.go,.xq button.nx{background:var(--ex)}
+.step button{width:40px;height:40px;border-radius:50%;border:1px solid var(--bd);background:var(--sf);font-size:20px;cursor:pointer}.step{display:flex;gap:10px;align-items:center;justify-content:center}
+.sc{font-size:13px;color:var(--mu)}.ti{margin:4px 0}.ok{color:var(--ac);font-weight:600}.er{color:var(--er);font-weight:600}.mu,.hint{color:var(--mu);font-size:14px}
+</style></head><body>
+<header><h1>🧪 Hiilivetylabra</h1><p>Nimeä ja piirrä alkaanit, alkeenit ja alkyynit</p></header>
+<nav><button data-t=t class=on>Teoria</button><button data-t=q>Harjoittele</button><button data-t=xt class=x>★ Extra: teoria</button><button data-t=xq class=x>★ Extra: harjoittele</button></nav>
+<main><section id=t class="p on"></section><section id=q class=p></section><section id=xt class="p xp"></section><section id=xq class="p xq"></section></main>
+<script>
+const ST=['','met','et','prop','but','pent','heks','hept','okt'],SUF={0:'aani',2:'eeni',3:'yyni'};
+const sub=x=>String(x).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[d]);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[R(0,a.length-1)];
+const fromS=s=>({n:s.n,b:Array.from({length:s.n-1},(_,i)=>s.t&&i==s.p-1?s.t:1),me:Array.from({length:s.n},(_,i)=>s.me.filter(x=>x==i+1).length)});
+const toS=m=>{let t=0,p=0;m.b.forEach((o,i)=>{if(o>1){t=o;p=i+1}});return{n:m.n,t,p,me:m.me.flatMap((c,i)=>Array(c).fill(i+1))}};
+function an(s){const n=s.n,ds=[0,1].map(d=>({bp:s.t?(d?n-s.p:s.p):0,mm:s.me.map(x=>d?n+1-x:x).sort((a,b)=>a-b)}));
+ const lt=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!=b[i])return a[i]<b[i];return 0};
+ const[a,b]=ds,u=(s.t&&a.bp!=b.bp?b.bp<a.bp:lt(b.mm,a.mm))?b:a,bp=s.t&&n>3?u.bp+'-':'',core=ST[n]+SUF[s.t];
+ const name=u.mm.length?u.mm.join(',')+'-'+(u.mm.length>1?'di':'')+'metyyli'+(bp?'-':'')+bp+core:bp+core;return{name,bp:u.bp,mm:u.mm}}
+const nm=s=>an(s).name;
+const fm=s=>{const C=s.n+s.me.length,H=2*C+2-(s.t?2*(s.t-1):0);return'C'+(C>1?sub(C):'')+'H'+sub(H)};
+const ex2=s=>{const a=an(s);return`Pisin ketju: ${s.n} C → ${ST[s.n]}-. `+(s.t?`${s.t==2?'Kaksois':'Kolmois'}sidos → pääte -${SUF[s.t]}`+(s.n>3?`; numerointi aloitetaan siitä päästä, josta sidos saa pienemmän numeron (${a.bp}).`:'.'):'Vain yksinkertaisia sidoksia → pääte -aani.')+(a.mm.length?` Metyyliryhmät kohdissa ${a.mm.join(', ')}.`:'')};
+function render(m,edit,extra){const{n,b,me}=m,dx=40,W=(n-1)*dx+80,Y=75,X=i=>40+i*dx;let o='';
+ const T=(x,y,t,w)=>`<text x="${x}" y="${y+5}" text-anchor="middle" font-size="15" ${w?'font-weight="700"':''} fill="currentColor">${t}</text>`;
+ const L=(a,c,d,e)=>`<line x1="${a}" y1="${c}" x2="${d}" y2="${e}" stroke="currentColor" stroke-width="1.6"/>`;
+ for(let i=0;i<n;i++){const x=X(i),l=i?b[i-1]:0,r=i<n-1?b[i]:0,s=l+r,mc=me[i]||0,term=!i||i==n-1;
+  const items=[...Array(4-s-mc).fill('H'),...Array(mc).fill('CH₃')];
+  const slots=n==1?['u','d','l','r']:term?(s==3?['o']:['u','d','o']):['u','d'];
+  o+=T(x,Y,'C',1);
+  items.forEach((t,k)=>{let q=slots[k];if(q=='o')q=i?'r':'l';
+   if(q=='u')o+=L(x,Y-11,x,Y-24)+T(x,Y-34,t);if(q=='d')o+=L(x,Y+11,x,Y+24)+T(x,Y+34,t);
+   if(q=='l')o+=L(x-11,Y,x-22,Y)+T(x-33,Y,t);if(q=='r')o+=L(x+11,Y,x+22,Y)+T(x+33,Y,t)});
+  if(i<n-1){const k=b[i];(k==1?[0]:k==2?[-2.5,2.5]:[-5,0,5]).forEach(d=>o+=L(x+11,Y+d,x+dx-11,Y+d))}}
+ if(edit){for(let i=0;i<n-1;i++)o+=`<rect class=hit data-b=${i} x="${X(i)+11}" y="${Y-20}" width="${dx-22}" height="40" rx="6"/>`;
+  if(extra)for(let i=1;i<n-1;i++)o+=`<circle class=hit data-c=${i} cx="${X(i)}" cy="${Y}" r="11"/>`}
+ return`<svg viewBox="0 0 ${W} 150" style="width:100%;height:auto;max-width:${W*1.4}px" font-family="system-ui,sans-serif">${o}</svg>`}
+function gen(ex,mx){if(!ex){const n=R(1,mx),t=n==1?0:pick([0,2,3]);return{n,t,p:t?1:0,me:[]}}
+ for(;;){const n=R(4,Math.max(4,mx)),k=pick(['b','m','bm']);let t=0,p=0,me=[];
+  if(k!='m'){t=pick([2,2,3]);p=R(1,n-1)}
+  if(k!='b'){const ok=[];for(let i=2;i<n;i++)if(!(t==3&&(i==p||i==p+1)))ok.push(i);if(!ok.length)continue;
+   const c=k=='m'?R(1,2):1+(t==2&&Math.random()<.3);for(let j=0;j<c;j++){const q=pick(ok);if(t&&me.includes(q))continue;me.push(q)}if(!me.length)continue}
+  return{n,t,p,me:me.sort((a,b)=>a-b)}}}
+function prac(el,ex){let mx=8,mode='mix',cur,kind,done,m,sc=0,tot=0,st=0;const $=q=>el.querySelector(q);
+ const opts=(a,b)=>Array.from({length:b-a+1},(_,i)=>`<option ${a+i==8?'selected':''}>${a+i}</option>`).join('');
+ el.innerHTML=`<div class=ctl><label>Tehtävä <select class=md><option value=name>Nimeä</option><option value=draw>Piirrä</option><option value=mix selected>Sekaisin</option></select></label><label>Hiiliä enintään <select class=mx>${opts(ex?4:1,8)}</select></label></div><div class=card><div class=sc></div><h3 class=ti></h3><div class=fig></div><div class=ar></div><div class=fb></div></div>`;
+ const pt=()=>{$('.fig').innerHTML=render(kind=='name'?fromS(cur):m,kind=='draw'&&!done,ex);const n=$('.nn');if(n)n.textContent=m.n;$('.sc').textContent=`Oikein ${sc}/${tot} · putki ${st}`};
+ const fix=()=>{const n=m.n;m.me[0]=0;m.me[n-1]=0;for(let j=0;j<n;j++){const s=(j?m.b[j-1]:0)+(j<n-1?m.b[j]:0);m.me[j]=Math.min(m.me[j],Math.min(2,4-s))}};
+ const eq=(a,c)=>{const z=s=>s.toLowerCase().replace(/[\s\-–−]/g,'');return z(a)==z(c)||(cur.t&&!cur.me.length&&c.startsWith('1-')&&z(a)==z(c.slice(2)))};
+ function nx(){cur=gen(ex,mx);kind=mode=='mix'?pick(['name','draw']):mode;done=0;m={n:3,b:[1,1],me:[0,0,0]};$('.fb').innerHTML='';
+  $('.ti').innerHTML=kind=='name'?'Nimeä yhdiste':`Piirrä: <b>${nm(cur)}</b> <small>${fm(cur)}</small>`;
+  $('.ar').innerHTML=kind=='name'?`<input class=in placeholder="Kirjoita nimi, esim. ${ex?'2-metyylibutaani':'propaani'}" autocomplete=off autocapitalize=none><button class=go>Tarkista</button>`:`<div class=step><button class=mi>−</button><span><b class=nn></b> hiiltä</span><button class=pl>+</button></div><p class=hint>Napauta sidosta: yksinkertainen → kaksois- → kolmoissidos.${ex?' Napauta hiiltä lisätäksesi metyyliryhmän (CH₃).':''}</p><button class=go>Tarkista</button>`;pt()}
+ function ck(){if(done)return;let good;if(kind=='name'){const v=$('.in').value.trim();if(!v)return;good=eq(v,nm(cur))}else good=nm(toS(m))==nm(cur);
+  done=1;tot++;good?(sc++,st++):st=0;
+  $('.fb').innerHTML=`<p class="${good?'ok':'er'}">${good?'✓ Oikein!':'✗ Ei aivan.'} <b>${nm(cur)}</b> <small>${fm(cur)}</small></p><p class=mu>${ex2(cur)}</p>${!good&&kind=='draw'?'<div>Oikea rakenne:</div>'+render(fromS(cur)):''}<button class=nx>Seuraava →</button>`;pt()}
+ el.onclick=e=>{const t=e.target,d=t.dataset,c=t.classList;if(c.contains('go'))return ck();if(c.contains('nx'))return nx();if(kind!='draw'||done)return;
+  if(c.contains('mi')&&m.n>1){m.n--;m.b.pop();m.me.pop()}else if(c.contains('pl')&&m.n<8){m.n++;m.b.push(1);m.me.push(0)}
+  else if(d.b!=null){const i=+d.b,v=m.b[i]%3+1;m.b=m.b.map(()=>1);m.b[i]=v}
+  else if(d.c!=null){const j=+d.c,s=m.b[j-1]+m.b[j],mxm=Math.min(2,4-s);m.me[j]=m.me[j]+1>mxm?0:m.me[j]+1}else return;fix();pt()};
+ el.onchange=e=>{if(e.target.classList.contains('md'))mode=e.target.value;else mx=+e.target.value;nx()};
+ el.onkeydown=e=>{if(e.key=='Enter'&&e.target.classList.contains('in'))done?nx():ck()};nx()}
+const F=s=>`<figure>${render(fromS(s))}<figcaption>${nm(s)} <small>${fm(s)}</small></figcaption></figure>`;
+const G=a=>`<div class=grid>${a.map(F).join('')}</div>`;
+const rows=Array.from({length:8},(_,i)=>{const n=i+1,a=(t)=>nm({n,t,p:1,me:[]}),f=(h)=>'C'+(n>1?sub(n):'')+'H'+sub(h);
+ return`<tr><td>${n}</td><td>${ST[n]}-</td><td>${a(0)}<br><small>${f(2*n+2)}</small></td><td>${n>1?a(2)+'<br><small>'+f(2*n)+'</small>':'–'}</td><td>${n>1?a(3)+'<br><small>'+f(2*n-2)+'</small>':'–'}</td></tr>`}).join('');
+document.getElementById('t').innerHTML=`
+<h2>Mitä hiilivedyt ovat?</h2><p>Hiilivedyt ovat yhdisteitä, joissa on vain <b>hiiltä (C)</b> ja <b>vetyä (H)</b>. Hiili muodostaa aina <b>4 sidosta</b> ja vety 1 sidoksen. Sidosten mukaan hiilivedyt jaetaan kolmeen ryhmään:</p>
+<div class=box><table><tr><th>Ryhmä</th><th>Sidokset</th><th>Pääte</th><th>Kaava</th></tr><tr><td>Alkaanit</td><td>vain yksinkertaisia</td><td>-aani</td><td>C<sub>n</sub>H<sub>2n+2</sub></td></tr><tr><td>Alkeenit</td><td>yksi kaksoissidos C=C</td><td>-eeni</td><td>C<sub>n</sub>H<sub>2n</sub></td></tr><tr><td>Alkyynit</td><td>yksi kolmoissidos C≡C</td><td>-yyni</td><td>C<sub>n</sub>H<sub>2n−2</sub></td></tr></table></div>
+<h2>Nimeäminen vaihe vaiheelta</h2><ol><li><b>Laske hiilet</b> ketjusta → nimen alkuosa (etuliite).</li><li><b>Tarkista sidokset</b> → nimen pääte (-aani, -eeni tai -yyni).</li><li><b>Yhdistä</b> etuliite ja pääte. Alkeenin tai alkyynin sidos on tässä osassa ketjun päässä (kohta 1); alkaen 4 hiilestä se kirjoitetaan nimeen: <i>1-buteeni</i>.</li></ol>
+<div class=box style="overflow-x:auto"><table><tr><th>C</th><th>Etuliite</th><th>Alkaani</th><th>Alkeeni</th><th>Alkyyni</th></tr>${rows}</table></div>
+<div class=tip>Muista: met-, et-, prop-, but- ovat erikoisia. Siitä eteenpäin etuliite tulee kreikan luvuista: pent- (5), heks- (6), hept- (7), okt- (8).</div>
+<h2>Esimerkkejä</h2>${G([{n:3,t:0,p:0,me:[]},{n:2,t:2,p:1,me:[]},{n:4,t:2,p:1,me:[]},{n:2,t:3,p:1,me:[]},{n:5,t:3,p:1,me:[]},{n:6,t:0,p:0,me:[]}])}
+<p class=mu>Huomaa, että jokaisella hiilellä on tasan 4 sidosta: kaksoissidos laskee kahdeksi, kolmoissidos kolmeksi. Loput sidokset täytetään vedyillä.</p>`;
+document.getElementById('xt').innerHTML=`
+<h2>1. Kaksois- ja kolmoissidoksen paikka</h2><p>Kun ketjussa on vähintään 4 hiiltä, sidos voi olla eri kohdissa. Silloin sen paikka merkitään nimeen numerolla.</p>
+<ol><li>Numeroi hiilet siitä päästä, josta sidos saa <b>pienemmän numeron</b>.</li><li>Sidoksen numero on sen ensimmäisen hiilen numero (C2=C3 → 2).</li><li>Kirjoita numero ja viiva etuliitteen eteen: <i>2-penteeni</i>.</li></ol>
+${G([{n:5,t:2,p:1,me:[]},{n:5,t:2,p:2,me:[]},{n:5,t:2,p:3,me:[]},{n:4,t:3,p:2,me:[]},{n:6,t:3,p:3,me:[]},{n:7,t:2,p:5,me:[]}])}
+<div class=tip>Kolmas kuva on <b>2-penteeni</b>, ei 3-penteeni: vasemmalta sidos olisi kohdassa 3, oikealta kohdassa 2. Valitaan pienempi. Samoin viimeinen kuva on 2-hepteeni. Eteenillä ja propeenilla (1–3 C) paikkaa ei tarvita.</div>
+<h2>2. Haarat: metyyliryhmä</h2><p>Haara on ketjuun kiinnittynyt hiiliryhmä. Yhden hiilen haara on <b>metyyli</b> (–CH₃).</p>
+<ol><li>Etsi <b>pisin hiiliketju</b> ja nimeä se.</li><li>Numeroi ketju niin, että haarojen paikkanumerot jäävät mahdollisimman pieniksi.</li><li>Kirjoita haaran paikka ja nimi ketjun nimen eteen: <i>2-metyylibutaani</i> (ei väliviivaa metyylin ja ketjun väliin).</li><li>Useampi samanlainen haara: <b>di-</b> (2 kpl), paikat pilkulla: <i>2,3-dimetyylibutaani</i>. Jos molemmat ovat samassa hiilessä, numero kirjoitetaan kahdesti: <i>2,2-dimetyylipropaani</i>.</li></ol>
+${G([{n:4,t:0,p:0,me:[2]},{n:4,t:0,p:0,me:[3]},{n:5,t:0,p:0,me:[3]},{n:4,t:0,p:0,me:[2,3]},{n:3,t:0,p:0,me:[2,2]},{n:6,t:0,p:0,me:[2,5]}])}
+<div class=tip>Kaksi ensimmäistä kuvaa ovat sama molekyyli! Haara on toisessa kuvassa kolmannessa hiilessä, mutta oikealta laskien toisessa → 2-metyylibutaani.</div>
+<h2>3. Haara ja sidos yhdessä</h2><p>Numeroinnin tärkeysjärjestys:</p><ol><li>Pisin ketju, jossa on mukana kaksois- tai kolmoissidos.</li><li>Sidoksen numero mahdollisimman pieneksi.</li><li>Jos sidos saa saman numeron kummastakin päästä, haarojen numerot mahdollisimman pieniksi.</li></ol><p>Nimen rakenne: <b>haarat – sidoksen paikka – ketjun nimi</b>.</p>
+${G([{n:4,t:2,p:1,me:[3]},{n:5,t:2,p:2,me:[2]},{n:5,t:3,p:2,me:[4]},{n:3,t:2,p:1,me:[2]}])}
+<p class=mu>Ensimmäinen kuva: 3-metyyli-1-buteeni, sillä sidos on tärkeämpi kuin haara. Viimeinen: 2-metyylipropeeni (propeenissa sidoksen paikkaa ei tarvita).</p>
+<h2>4. Yleisiä virheitä</h2><ul><li>Numerointi aloitetaan väärästä päästä. Kokeile aina molempia suuntia.</li><li>Haara ei voi olla ketjun päässä: se vain pidentäisi ketjua.</li><li>Kolmoissidoksen hiileen ei mahdu haaraa (hiilellä on jo 4 sidosta). Kaksoissidoksen hiileen mahtuu yksi.</li><li>Pisintä ketjua ei valita suoran viivan mukaan vaan laskemalla hiilet.</li></ul>`;
+prac(document.getElementById('q'),0);prac(document.getElementById('xq'),1);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,.p').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.t).classList.add('on')});
+</script></body></html>
